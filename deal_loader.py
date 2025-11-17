@@ -22,6 +22,7 @@ except ImportError:  # pragma: no cover
 @dataclass
 class DealResult:
     spv: str
+    config_name: str
     file_path: Path
     business_date: str
     static_values: Dict[str, Any]
@@ -241,9 +242,17 @@ def process_file(config: Dict[str, Any], workbook_path: Path) -> DealResult:
         **variable_values,
         **calculated_values,
     }
+    config_name = config.get("_file")
+    if isinstance(config_name, Path):
+        config_name = config_name.stem
+    elif isinstance(config_name, str):
+        config_name = Path(config_name).stem
+    else:
+        config_name = config.get("spv", "deal")
 
     return DealResult(
         spv=config["spv"],
+        config_name=config_name,
         file_path=workbook_path,
         business_date=business_date,
         static_values=static_values,
@@ -388,29 +397,37 @@ def render_email(results: List[DealResult], profile: Dict[str, Any]) -> str:
 
     # Detail sections per deal
     detail_sections = []
-    detail_rows_def = profile.get("detail_rows", [])
+    layout_map = profile.get("deal_layouts", {})
+    default_detail_rows = profile.get("detail_rows") or profile.get("detail_defaults") or []
     for result in results:
         rows_html = []
-        if detail_rows_def:
-            for row in detail_rows_def:
+        detail_rows = []
+        if isinstance(layout_map, dict):
+            detail_rows = (layout_map.get(result.config_name) or {}).get("detail_rows", [])
+        if not detail_rows:
+            detail_rows = default_detail_rows
+        if detail_rows:
+            for row in detail_rows:
                 left_label = row.get("left_label", "")
                 left_type = row.get("left_type") or "field"
+                left_source = row.get("left_source", "")
                 left_value = (
                     row.get("left_text", "")
                     if left_type == "text"
-                    else format_value(resolve_source(result, row.get("left_source", "")))
+                    else format_value(resolve_source(result, left_source))
                 )
                 right_label = row.get("right_label", "")
                 right_type = row.get("right_type") or "field"
+                right_source = row.get("right_source", "")
                 right_value = (
                     row.get("right_text", "")
                     if right_type == "text"
-                    else format_value(resolve_source(result, row.get("right_source", "")))
+                    else format_value(resolve_source(result, right_source))
                 )
                 rows_html.append(
                     "<tr>"
-                    f"<th>{left_label}</th><td>{left_value}</td>"
-                    f"<th>{right_label}</th><td>{right_value}</td>"
+                    f"<th>{left_label}</th><td>{left_value or '—'}</td>"
+                    f"<th>{right_label}</th><td>{right_value or '—'}</td>"
                     "</tr>"
                 )
         else:

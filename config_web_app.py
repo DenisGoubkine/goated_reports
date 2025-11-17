@@ -39,6 +39,7 @@ DEFAULT_REPORT_PROFILE = {
         {"label": "Max Facility Advance Rate", "source": "max_facility_advance_rate", "format": "percentage"},
         {"label": "Effective Advance Rate", "source": "effective_advance_rate", "format": "percentage"},
     ],
+    "deal_layouts": {},
     "detail_rows": [],
 }
 
@@ -53,11 +54,37 @@ def load_report_profile() -> Dict[str, Any]:
 REPORT_PROFILE = load_report_profile()
 
 
+def validate_detail_rows(detail_rows: Any) -> Any:
+    if not isinstance(detail_rows, list):
+        return "Must be an array."
+    row_errors: Dict[int, Any] = {}
+    for idx, row in enumerate(detail_rows):
+        if not isinstance(row, dict):
+            row_errors[idx] = "Each row must be an object."
+            continue
+        for side in ("left", "right"):
+            label_key = f"{side}_label"
+            type_key = f"{side}_type"
+            source_key = f"{side}_source"
+            text_key = f"{side}_text"
+            if not row.get(label_key):
+                row_errors.setdefault(idx, {})[label_key] = "Label required."
+            value_type = row.get(type_key) or "field"
+            row[type_key] = value_type
+            if value_type == "text":
+                if not row.get(text_key):
+                    row_errors.setdefault(idx, {})[text_key] = "Text required."
+            else:
+                if not row.get(source_key):
+                    row_errors.setdefault(idx, {})[source_key] = "Source required."
+            if value_type not in ("field", "text"):
+                row_errors.setdefault(idx, {})[type_key] = "Type must be 'field' or 'text'."
+    return row_errors
+
+
 def validate_report_profile(profile: Dict[str, Any]) -> Dict[str, Any]:
     errors: Dict[str, Any] = {}
     summary_fields = profile.get("summary_fields", [])
-    detail_rows = profile.get("detail_rows", [])
-
     if not isinstance(summary_fields, list):
         errors["summary_fields"] = "Must be an array."
     else:
@@ -70,37 +97,28 @@ def validate_report_profile(profile: Dict[str, Any]) -> Dict[str, Any]:
             if not field.get("source"):
                 errors.setdefault("summary_fields", {})[idx] = "Source is required."
 
-    if not isinstance(detail_rows, list):
-        errors["detail_rows"] = "Must be an array."
+    deal_layouts = profile.get("deal_layouts", {})
+    if not isinstance(deal_layouts, dict):
+        errors["deal_layouts"] = "Must be an object."
     else:
-        for idx, row in enumerate(detail_rows):
-            if not isinstance(row, dict):
-                errors.setdefault("detail_rows", {})[idx] = "Each row must be an object."
+        for deal_name, layout in deal_layouts.items():
+            if not isinstance(layout, dict):
+                errors.setdefault("deal_layouts", {})[deal_name] = "Layout must be an object."
                 continue
-            for side in ("left", "right"):
-                label_key = f"{side}_label"
-                type_key = f"{side}_type"
-                source_key = f"{side}_source"
-                text_key = f"{side}_text"
-                if not row.get(label_key):
-                    errors.setdefault("detail_rows", {}).setdefault(idx, {})[label_key] = "Label required."
-                if row.get(type_key) == "text":
-                    if not row.get(text_key):
-                        errors.setdefault("detail_rows", {}).setdefault(idx, {})[text_key] = "Text required."
-                else:
-                    if not row.get(source_key):
-                        errors.setdefault("detail_rows", {}).setdefault(idx, {})[source_key] = "Source required."
-                if row.get(type_key) not in (None, "field", "text"):
-                    errors.setdefault("detail_rows", {}).setdefault(idx, {})[type_key] = "Type must be 'field' or 'text'."
-            row["left_type"] = row.get("left_type") or "field"
-            row["right_type"] = row.get("right_type") or "field"
+            detail_rows = layout.get("detail_rows", [])
+            detail_errors = validate_detail_rows(detail_rows)
+            if isinstance(detail_errors, str):
+                errors.setdefault("deal_layouts", {})[deal_name] = {"detail_rows": detail_errors}
+            elif detail_errors:
+                errors.setdefault("deal_layouts", {})[deal_name] = {"detail_rows": detail_errors}
 
     return errors
 
 
-def render_profile_preview(profile: Dict[str, Any]) -> str:
+def render_profile_preview(profile: Dict[str, Any], detail_rows: Any = None) -> str:
     summary_fields = profile.get("summary_fields", [])
-    detail_rows = profile.get("detail_rows", [])
+    if detail_rows is None:
+        detail_rows = profile.get("detail_rows", [])
 
     summary_header = "".join("<th>{}</th>".format(field.get("label", "")) for field in summary_fields)
     summary_rows = "".join(
@@ -359,10 +377,24 @@ def update_report_profile():
 def visualize_report_profile():
     payload = request.get_json(force=True) or {}
     profile_data = payload.get("profile", payload)
-    errors = validate_report_profile(profile_data)
-    if errors:
-        return jsonify({"error": "validation_error", "details": errors}), 400
-    html = render_profile_preview(profile_data)
+    if "deal_layouts" in profile_data:
+        errors = validate_report_profile(profile_data)
+        if errors:
+            return jsonify({"error": "validation_error", "details": errors}), 400
+        first_layout = next(iter(profile_data.get("deal_layouts", {}).values()), {})
+        detail_rows = first_layout.get("detail_rows", [])
+        html = render_profile_preview(profile_data, detail_rows)
+        return jsonify({"html": html})
+    summary_fields = profile_data.get("summary_fields", [])
+    if not isinstance(summary_fields, list):
+        return jsonify({"error": "validation_error", "details": {"summary_fields": "Must be an array."}}), 400
+    detail_rows = profile_data.get("detail_rows", [])
+    detail_errors = validate_detail_rows(detail_rows)
+    if isinstance(detail_errors, str):
+        return jsonify({"error": "validation_error", "details": {"detail_rows": detail_errors}}), 400
+    if detail_errors:
+        return jsonify({"error": "validation_error", "details": {"detail_rows": detail_errors}}), 400
+    html = render_profile_preview({"summary_fields": summary_fields}, detail_rows)
     return jsonify({"html": html})
 
 

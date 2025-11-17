@@ -36,6 +36,9 @@
     .hint { font-size: 0.85rem; color: #5a6b8c; margin: 0; }
     .row-actions button { background: none; border: none; color: #a82138; cursor: pointer; font-size: 0.85rem; padding: 0; }
     .row-actions button:hover { text-decoration: underline; }
+    .missing-summary { background: #ffeef0; }
+    .missing-warning { color: #b01a33; font-size: 0.9rem; margin-top: 0.4rem; }
+    .panel h3 { margin: 0; font-size: 1rem; }
   </style>
 </head>
 <body>
@@ -79,6 +82,7 @@
         </thead>
         <tbody></tbody>
       </table>
+      <div id="summary-warning" class="missing-warning"></div>
       <button id="add-summary-field" class="light">+ Add Summary Field</button>
     </section>
 

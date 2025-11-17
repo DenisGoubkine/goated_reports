@@ -12,10 +12,41 @@ const resetProfileBtn = document.getElementById("reset-profile");
 const profileStatus = document.getElementById("profile-status");
 const previewBox = document.getElementById("profile-preview");
 const visualizeBtn = document.getElementById("visualize-report");
+const summaryWarning = document.getElementById("summary-warning");
 
 let configs = [];
-let profile = { summary_fields: [], detail_rows: [] };
+let profile = { summary_fields: [], deal_layouts: {} };
 let metrics = [{ label: "As of Date (Business Date)", value: "@business_date" }];
+let currentDealKey = "";
+
+function getCurrentDeal() {
+  return configSelect.value || currentDealKey || (configs[0]?.name || "");
+}
+
+function ensureDealLayout(dealKey) {
+  if (!dealKey) {
+    return {"detail_rows": []};
+  }
+  if (!profile.deal_layouts) profile.deal_layouts = {};
+  if (!profile.deal_layouts[dealKey]) {
+    profile.deal_layouts[dealKey] = { detail_rows: [] };
+  }
+  const layout = profile.deal_layouts[dealKey];
+  if (!Array.isArray(layout.detail_rows)) layout.detail_rows = [];
+  return layout;
+}
+
+function getCurrentDetailRows() {
+  const dealKey = getCurrentDeal();
+  if (!dealKey) {
+    return null;
+  }
+  const layout = ensureDealLayout(dealKey);
+  if (!layout.detail_rows.length) {
+    layout.detail_rows.push(defaultDetailRow());
+  }
+  return layout.detail_rows;
+}
 
 function fetchJSON(url, options) {
   return fetch(url, options).then((response) => {
@@ -42,6 +73,10 @@ async function loadConfigs() {
       option.textContent = `${entry.name} (updated ${entry.updated.slice(0, 10)})`;
       configSelect.appendChild(option);
     });
+    if (configs.length && !configSelect.value) {
+      configSelect.value = configs[0].name;
+    }
+    currentDealKey = configSelect.value || currentDealKey;
     configStatus.textContent = `${configs.length} configs`;
   } catch (err) {
     configStatus.textContent = `Failed to load configs: ${err.message}`;
@@ -52,13 +87,16 @@ async function loadProfile() {
   try {
     profile = await fetchJSON("/api/report/profile");
   } catch {
-    profile = { summary_fields: [], detail_rows: [] };
+    profile = { summary_fields: [], deal_layouts: {} };
   }
   if (!Array.isArray(profile.summary_fields)) profile.summary_fields = [];
-  if (!Array.isArray(profile.detail_rows)) profile.detail_rows = [];
+  if (!profile.deal_layouts || typeof profile.deal_layouts !== "object") {
+    profile.deal_layouts = {};
+  }
   renderSummaryFields();
   renderDetailRows();
   renderPreview();
+  if (profileStatus) profileStatus.textContent = "";
 }
 
 async function loadMetrics() {
@@ -67,6 +105,7 @@ async function loadMetrics() {
     configStatus.textContent = "Select a config.";
     return;
   }
+  currentDealKey = selected;
   configStatus.textContent = "Loading metrics…";
   try {
     const data = await fetchJSON(`/api/configs/${encodeURIComponent(selected)}`);
@@ -87,8 +126,10 @@ async function loadMetrics() {
       .map((metric) => `<div>• ${metric.label} (${metric.value})</div>`)
       .join("");
     configStatus.textContent = `Loaded ${metrics.length} metrics from ${selected}`;
+    ensureDealLayout(selected);
     renderSummaryFields();
     renderDetailRows();
+    if (profileStatus) profileStatus.textContent = "";
   } catch (err) {
     configStatus.textContent = `Metrics load failed: ${err.message}`;
   }
@@ -215,7 +256,13 @@ function createDetailRow(row = defaultDetailRow()) {
   removeBtn.className = "row-actions";
   removeBtn.textContent = "Remove";
   removeBtn.addEventListener("click", () => {
-    profile.detail_rows = profile.detail_rows.filter((item) => item !== row);
+    const rows = getCurrentDetailRows();
+    if (rows) {
+      const index = rows.indexOf(row);
+      if (index >= 0) {
+        rows.splice(index, 1);
+      }
+    }
     renderDetailRows();
     renderPreview();
   });
@@ -319,9 +366,22 @@ function renderSummaryFields() {
   if (!profile.summary_fields.length) {
     profile.summary_fields.push({ label: "", source: "" });
   }
+  const showMissing = metrics.length > 1;
+  const metricValues = new Set(metrics.map((metric) => metric.value));
+  const missingLabels = [];
   profile.summary_fields.forEach((field) => {
-    summaryTableBody.appendChild(createSummaryRow(field));
+    const row = createSummaryRow(field);
+    if (showMissing && field.source && field.source !== "@business_date" && !metricValues.has(field.source)) {
+      row.classList.add("missing-summary");
+      missingLabels.push(field.label || field.source);
+    }
+    summaryTableBody.appendChild(row);
   });
+  if (summaryWarning) {
+    summaryWarning.textContent = showMissing && missingLabels.length
+      ? `Missing in current config: ${missingLabels.join(", ")}`
+      : "";
+  }
 }
 
 function defaultDetailRow() {
@@ -339,10 +399,12 @@ function defaultDetailRow() {
 
 function renderDetailRows() {
   detailTableBody.innerHTML = "";
-  if (!profile.detail_rows.length) {
-    profile.detail_rows.push(defaultDetailRow());
+  const rows = getCurrentDetailRows();
+  if (!rows || !rows.length) {
+    detailTableBody.innerHTML = "<tr><td colspan='5'>Select a config and load metrics to design detail rows.</td></tr>";
+    return;
   }
-  profile.detail_rows.forEach((row) => {
+  rows.forEach((row) => {
     detailTableBody.appendChild(createDetailRow(row));
   });
 }
@@ -368,10 +430,11 @@ async function saveProfile() {
 }
 
 function resetProfile() {
-  profile = { summary_fields: [], detail_rows: [] };
+  profile = { summary_fields: [], deal_layouts: {} };
   renderSummaryFields();
   renderDetailRows();
   renderPreview();
+  if (summaryWarning) summaryWarning.textContent = "";
 }
 
 addSummaryFieldBtn.addEventListener("click", () => {
@@ -380,7 +443,12 @@ addSummaryFieldBtn.addEventListener("click", () => {
 });
 
 addDetailRowBtn.addEventListener("click", () => {
-  profile.detail_rows.push(defaultDetailRow());
+  const rows = getCurrentDetailRows();
+  if (!rows) {
+    configStatus.textContent = "Select a config and load metrics before adding rows.";
+    return;
+  }
+  rows.push(defaultDetailRow());
   renderDetailRows();
 });
 
@@ -388,60 +456,32 @@ saveProfileBtn.addEventListener("click", saveProfile);
 resetProfileBtn.addEventListener("click", resetProfile);
 reloadConfigsBtn.addEventListener("click", loadConfigs);
 loadMetricsBtn.addEventListener("click", loadMetrics);
-function buildPreviewHTML() {
-  const summaryRows = (profile.summary_fields || [])
-    .map(
-      (field) =>
-        `<tr><td>${field.label || field.source}</td><td>${field.source ? `{{${field.source}}}` : ""}</td><td>${
-          field.format || ""
-        }</td></tr>`
-    )
-    .join("");
-  const detailRows = (profile.detail_rows || [])
-    .map((row) => {
-      const leftValue =
-        (row.left_type === "text" ? row.left_text : row.left_source ? `{{${row.left_source}}}` : "") || "";
-      const rightValue =
-        (row.right_type === "text" ? row.right_text : row.right_source ? `{{${row.right_source}}}` : "") || "";
-      return `<tr><th>${row.left_label || ""}</th><td>${leftValue}</td><th>${row.right_label || ""}</th><td>${rightValue}</td></tr>`;
-    })
-    .join("");
-
-  return `<!doctype html>
-  <html>
-    <head>
-      <meta charset="utf-8"/>
-      <title>Report Preview</title>
-      <style>
-        body { font-family: 'Segoe UI', Arial, sans-serif; background:#f5f7fb; color:#0f1a33; padding: 20px; }
-        .summary-table { width:100%; border-collapse: collapse; margin-bottom: 24px; background:#fff; border-radius: 16px; overflow:hidden; box-shadow:0 8px 24px rgba(15,42,99,0.08); }
-        .summary-table th, .summary-table td { padding: 10px; border-bottom:1px solid #eef2fb; text-align:left; }
-        .summary-table th { background:#1a3bb5; color:#fff; }
-        .detail-table { width:100%; border-collapse: collapse; background:#fff; border-radius: 16px; overflow:hidden; box-shadow:0 8px 24px rgba(15,42,99,0.08); }
-        .detail-table th { background:#f5f7ff; text-transform:uppercase; font-size:0.75rem; letter-spacing:0.05em; padding:10px; color:#4d5b7e; }
-        .detail-table td { padding:10px; border-bottom:1px solid #eef2fb; font-weight:600; color:#16255a; }
-      </style>
-    </head>
-    <body>
-      <h2>Summary Preview</h2>
-      <table class="summary-table">
-        <tr><th>Label</th><th>Value</th><th>Format</th></tr>
-        ${summaryRows || "<tr><td colspan='3'>No summary fields configured.</td></tr>"}
-      </table>
-      <h2>Detail Preview</h2>
-      <table class="detail-table">
-        ${detailRows || "<tr><td colspan='4'>No detail rows configured.</td></tr>"}
-      </table>
-    </body>
-  </html>`;
-}
-
+configSelect.addEventListener("change", () => {
+  currentDealKey = configSelect.value;
+  renderDetailRows();
+  renderSummaryFields();
+});
 if (visualizeBtn) {
   visualizeBtn.addEventListener("click", () => {
-    const html = buildPreviewHTML();
-    const blob = new Blob([html], { type: "text/html" });
-    const url = URL.createObjectURL(blob);
-    window.open(url, "_blank", "noopener");
+    const payload = {
+      summary_fields: profile.summary_fields,
+      detail_rows: getCurrentDetailRows() || [],
+    };
+    profileStatus.textContent = "Generating preview…";
+    fetchJSON("/api/report/visualize", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    })
+      .then((response) => {
+        const blob = new Blob([response.html], { type: "text/html" });
+        const url = URL.createObjectURL(blob);
+        window.open(url, "_blank", "noopener");
+        profileStatus.textContent = "Preview opened in new tab.";
+      })
+      .catch((err) => {
+        profileStatus.textContent = `Visualization failed: ${err.message}`;
+      });
   });
 }
 
