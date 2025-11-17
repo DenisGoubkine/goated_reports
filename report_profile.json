@@ -1,5 +1,4 @@
 {
-{
   "summary_fields": [
     {
       "label": "Client Name",
@@ -86,6 +85,7 @@
       "source": "effective_advance_rate"
     }
   ],
+  "detail_rows": [],
   "deal_layouts": {
     "denis_goubkine_fund": {
       "detail_rows": [
