@@ -1,0 +1,56 @@
+{
+  "spv": "Denis Goubkine Fund I LP",
+  "file_pattern": "Denis Goubkine Fund - Borrowing Base \\d{4}-\\d{2}-\\d{2}\\.xlsx",
+  "directory": "\\\\finance\\BorrowingBases\\DenisGoubkine",
+  "fields": {
+    "static_values": {
+      "client_name": "Denis Goubkine Family Office",
+      "borrower_name": "Denis Goubkine Borrower LLC",
+      "risk_rating": "Low Risk",
+      "closing_date": "2022-01-31",
+      "revolving_period_end_date": "2025-01-31",
+      "amortization_period_end_date": "2026-07-31",
+      "facility_maturity_date": "2027-01-31"
+    },
+    "cell_references": {
+      "global_advances_outstanding": { "sheet": "Summary", "cell": "B12" },
+      "global_commitment": { "sheet": "Summary", "cell": "B8" },
+      "bmo_advances_outstanding": { "sheet": "Lender Detail", "cell": "C9" },
+      "bmo_commitment": { "sheet": "Lender Detail", "cell": "C6" },
+      "collateral_par_balance": { "sheet": "Collateral", "cell": "B5" },
+      "max_facility_advance_rate": { "sheet": "Summary", "cell": "B16" }
+    },
+    "variables": {
+      "asset_pool_value": { "sheet": "Collateral", "cell": "B7" },
+      "reserve_amount": { "sheet": "Summary", "cell": "B18" },
+      "undrawn_commitment": { "sheet": "Summary", "cell": "B9" },
+      "days_past_due": { "sheet": "Watchlist", "cell": "B4" }
+    },
+    "calculated_fields": {
+      "effective_advance_rate": {
+        "formula": "global_advances_outstanding / collateral_par_balance",
+        "data_type": "percentage"
+      },
+      "bmo_utilization": {
+        "formula": "bmo_advances_outstanding / bmo_commitment",
+        "data_type": "percentage"
+      },
+      "liquidity_buffer": {
+        "formula": "collateral_par_balance - global_advances_outstanding - reserve_amount",
+        "data_type": "number"
+      },
+      "borrowing_base_headroom": {
+        "formula": "global_commitment - global_advances_outstanding",
+        "data_type": "number"
+      },
+      "undrawn_percent": {
+        "formula": "undrawn_commitment / global_commitment",
+        "data_type": "percentage"
+      }
+    }
+  },
+  "data_source": {
+    "type": "filename",
+    "regex": "\\\\d{4}-\\\\d{2}-\\\\d{2}"
+  }
+}

@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Report Profile Builder</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  </head>
+  <body>
+    <header>
+      <div>
+        <h1>Report Profile Builder</h1>
+        <p>Create the shared summary + detail rows used by all deals.</p>
+      </div>
+      <a href="/" class="back-link">← Back to Config Builder</a>
+    </header>
+    <main>
+      <section class="config-panel">
+        <h2>1 · Source Config</h2>
+        <p>Select any deal config to pull its available metrics.</p>
+        <label for="config-select">Use metrics from</label>
+        <select id="config-select"></select>
+        <div class="status" id="config-status"></div>
+        <div class="toolbar">
+          <button id="reload-configs" class="light">Reload Configs</button>
+          <button id="load-metrics" class="primary">Load Metrics</button>
+        </div>
+        <h3>Available Metrics</h3>
+        <div id="metric-list" class="metric-list">Select a config to list its metrics.</div>
+      </section>
+    <section class="grid-full summary-panel">
+      <h2>2 · Shared Summary</h2>
+      <p class="hint">These fields appear at the top of every email. Use format/aggregate to match how you want totals displayed.</p>
+      <table id="summary-table">
+        <thead>
+          <tr>
+            <th>Label</th>
+            <th>Source</th>
+            <th>Format</th>
+            <th>Aggregate</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      <button id="add-summary-field" class="light">+ Add Summary Field</button>
+    </section>
+    <section class="grid-full detail-panel">
+      <h2>3 · Detail Quadrants</h2>
+      <p class="hint">Each row renders four columns (label/value, label/value). Names sit in column 1 & 3; values sit in columns 2 & 4.</p>
+      <table id="detail-table" class="detail-table">
+        <thead>
+          <tr>
+            <th>Left Label</th>
+            <th>Left Value</th>
+            <th>Right Label</th>
+            <th>Right Value</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      <button id="add-detail-row" class="light">+ Add Detail Row</button>
+    </section>
+    <section class="grid-full actions-panel">
+      <h2>4 · Save & Preview</h2>
+      <div class="toolbar">
+        <button id="save-profile" class="primary">Save Profile</button>
+        <button id="reset-profile" class="light">Reset</button>
+        <button id="visualize-report" class="ghost">Visualize Email</button>
+      </div>
+      <div class="status" id="profile-status"></div>
+      <div class="preview-grid">
+        <div>
+          <h3>Profile JSON</h3>
+          <pre id="profile-preview" class="preview-box">Loading…</pre>
+        </div>
+        <div class="preview-card">
+          <h3>Guide</h3>
+          <ul>
+            <li><strong>Labels</strong> control what bankers see.</li>
+            <li><strong>Source</strong> is any metric from the selected config.</li>
+            <li><strong>Text value</strong> lets you insert notes or placeholders.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+  </main>
+  <script src="/static/report_builder.js"></script>
+</body>
+</html>
+</head>
+<body>
+  <header>
+    <h1>Report Profile Builder</h1>
+    <a href="/">← Back to Config Builder</a>
+  </header>
+  <main>
+    <section>
+      <h2>1 · Choose Deal Config</h2>
+      <label for="config-select">Use metrics from</label>
+      <select id="config-select"></select>
+      <div class="status" id="config-status"></div>
+      <div class="toolbar">
+        <button id="reload-configs" class="light">Reload Configs</button>
+        <button id="load-metrics" class="primary">Load Metrics</button>
+      </div>
+      <h3>Available Metrics</h3>
+      <div id="metric-list" style="font-size:0.9rem; color:#4d5a7c;">Select a config to list its metrics.</div>
+    </section>
+
+    <section class="grid-full">
+      <h2>2 · Shared Summary</h2>
+      <table id="summary-table">
+        <thead>
+          <tr>
+            <th>Label</th>
+            <th>Source</th>
+            <th>Format</th>

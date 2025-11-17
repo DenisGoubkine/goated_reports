@@ -1,0 +1,150 @@
+{
+  "detail_rows": [
+    {
+      "left_label": "Closing Date",
+      "left_source": "closing_date",
+      "left_text": "",
+      "left_type": "field",
+      "right_label": "Revolving Period End",
+      "right_source": "revolving_period_end_date",
+      "right_text": "",
+      "right_type": "field"
+    },
+    {
+      "left_label": "Amortization Period End",
+      "left_source": "amortization_period_end_date",
+      "left_text": "",
+      "left_type": "field",
+      "right_label": "Facility Maturity",
+      "right_source": "facility_maturity_date",
+      "right_text": "",
+      "right_type": "field"
+    },
+    {
+      "left_label": "Global Advances Outstanding",
+      "left_source": "global_advances_outstanding",
+      "left_text": "",
+      "left_type": "field",
+      "right_label": "Global Commitment",
+      "right_source": "global_commitment",
+      "right_text": "",
+      "right_type": "field"
+    },
+    {
+      "left_label": "BMO Advances Outstanding",
+      "left_source": "bmo_advances_outstanding",
+      "left_text": "",
+      "left_type": "field",
+      "right_label": "BMO Commitment",
+      "right_source": "bmo_commitment",
+      "right_text": "",
+      "right_type": "field"
+    },
+    {
+      "left_label": "BMO Utilization",
+      "left_source": "bmo_utilization",
+      "left_text": "",
+      "left_type": "field",
+      "right_label": "Collateral Par Balance",
+      "right_source": "collateral_par_balance",
+      "right_text": "",
+      "right_type": "field"
+    },
+    {
+      "left_label": "Effective Advance Rate",
+      "left_source": "effective_advance_rate",
+      "left_text": "",
+      "left_type": "field",
+      "right_label": "Max Facility Advance Rate",
+      "right_source": "max_facility_advance_rate",
+      "right_text": "",
+      "right_type": "field"
+    }
+  ],
+  "summary_fields": [
+    {
+      "label": "Client Name",
+      "source": "client_name"
+    },
+    {
+      "label": "Borrower Name",
+      "source": "borrower_name"
+    },
+    {
+      "label": "Risk Rating",
+      "source": "risk_rating"
+    },
+    {
+      "label": "Closing Date",
+      "source": "closing_date"
+    },
+    {
+      "label": "Revolving Period End Date",
+      "source": "revolving_period_end_date"
+    },
+    {
+      "label": "Amortization Period End Date",
+      "source": "amortization_period_end_date"
+    },
+    {
+      "label": "Facility Maturity Date",
+      "source": "facility_maturity_date"
+    },
+    {
+      "label": "As of Date",
+      "source": "@business_date",
+      "format": ""
+    },
+    {
+      "aggregate": "sum",
+      "format": "currency",
+      "label": "Global Advances Outstanding",
+      "source": "global_advances_outstanding"
+    },
+    {
+      "aggregate": "sum",
+      "format": "currency",
+      "label": "Global Commitment",
+      "source": "global_commitment"
+    },
+    {
+      "aggregate": "sum",
+      "format": "currency",
+      "label": "BMO Advances Outstanding",
+      "source": "bmo_advances_outstanding"
+    },
+    {
+      "aggregate": "sum",
+      "format": "currency",
+      "label": "BMO Commitment",
+      "source": "bmo_commitment"
+    },
+    {
+      "aggregate": "ratio",
+      "denominator": "bmo_commitment",
+      "format": "percentage",
+      "label": "BMO Utilization",
+      "numerator": "bmo_advances_outstanding",
+      "source": "bmo_utilization"
+    },
+    {
+      "aggregate": "sum",
+      "format": "currency",
+      "label": "Collateral Par Balance",
+      "source": "collateral_par_balance"
+    },
+    {
+      "format": "percentage",
+      "label": "Max Facility Advance Rate",
+      "source": "max_facility_advance_rate"
+    },
+    {
+      "aggregate": "ratio",
+      "denominator": "collateral_par_balance",
+      "format": "percentage",
+      "label": "Effective Advance Rate",
+      "numerator": "global_advances_outstanding",
+      "source": "effective_advance_rate"
+    }
+  ]
+}

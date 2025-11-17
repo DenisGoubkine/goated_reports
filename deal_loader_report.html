@@ -1,0 +1,43 @@
+
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; background:#f5f7fb; color:#0f1a33; }
+        .wrapper { max-width: 960px; margin: 0 auto; padding: 20px; }
+        .summary-table { width:100%; border-collapse: collapse; margin-bottom: 32px; background:#fff; border-radius: 16px; overflow:hidden; box-shadow:0 8px 24px rgba(15,42,99,0.08); }
+        .summary-table th { background:#1a3bb5; color:#fff; padding:10px; text-align:left; }
+        .summary-table td { padding:10px; border-bottom:1px solid #eef2fb; }
+        .summary-table .total-row td { background:#f0f3ff; font-weight:600; }
+        .deal-card { background:#fff; border-radius: 16px; padding: 20px; margin-bottom: 18px; box-shadow:0 8px 24px rgba(15,42,99,0.08); }
+        .deal-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px; }
+        .deal-header h3 { margin:0; }
+        .deal-header p { margin:4px 0 0; color:#5a6b8c; }
+        .detail-grid { width:100%; border-collapse: collapse; margin-top:10px; }
+        .detail-grid th { background:#f5f7ff; text-transform:uppercase; font-size:0.75rem; letter-spacing:0.05em; padding:8px; color:#4d6090; }
+        .detail-grid td { padding:8px; border-bottom:1px solid #eef2fb; font-weight:600; color:#16255a; }
+    </style>
+    <div class="wrapper">
+        <h2>Deal Summary</h2>
+        <table class='summary-table'><tr><th>Client Name</th><th>Borrower Name</th><th>Risk Rating</th><th>Closing Date</th><th>Revolving Period End Date</th><th>Amortization Period End Date</th><th>Facility Maturity Date</th><th>As of Date</th><th>Global Advances Outstanding</th><th>Global Commitment</th><th>BMO Advances Outstanding</th><th>BMO Commitment</th><th>BMO Utilization</th><th>Collateral Par Balance</th><th>Max Facility Advance Rate</th><th>Effective Advance Rate</th></tr><tr><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>2025-07-31</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr><tr><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>2025-10-11</td><td>—</td><td>0.00</td><td>—</td><td>10,000,000.00</td><td>80.00%</td><td>—</td><td>—</td><td>—</td></tr><tr class='total-row'><td><strong>TOTAL</strong></td><td class='total-cell'></td><td class='total-cell'></td><td class='total-cell'></td><td class='total-cell'></td><td class='total-cell'></td><td class='total-cell'></td><td class='total-cell'></td><td class='total-cell'>0.00</td><td class='total-cell'>0.00</td><td class='total-cell'>0.00</td><td class='total-cell'>10,000,000.00</td><td class='total-cell'>0.00%</td><td class='total-cell'>0.00</td><td class='total-cell'></td><td class='total-cell'></td></tr></table>
+        <h2>Deal Details</h2>
+        
+            <div class='deal-card'>
+                <div class='deal-header'>
+                    <div><h3>Global Capital Partners Fund II</h3></div>
+                    <div class='deal-date'><strong>As of:</strong> 2025-07-31</div>
+                </div>
+                <table class='detail-grid'>
+                    <tr><th>Closing Date</th><td>—</td><th>Revolving Period End</th><td>—</td></tr><tr><th>Amortization Period End</th><td>—</td><th>Facility Maturity</th><td>—</td></tr><tr><th>Global Advances Outstanding</th><td>—</td><th>Global Commitment</th><td>—</td></tr><tr><th>BMO Advances Outstanding</th><td>—</td><th>BMO Commitment</th><td>—</td></tr><tr><th>BMO Utilization</th><td>—</td><th>Collateral Par Balance</th><td>—</td></tr><tr><th>Effective Advance Rate</th><td>—</td><th>Max Facility Advance Rate</th><td>—</td></tr>
+                </table>
+            </div>
+            
+            <div class='deal-card'>
+                <div class='deal-header'>
+                    <div><h3>Core Income Funding I LLC</h3></div>
+                    <div class='deal-date'><strong>As of:</strong> 2025-10-11</div>
+                </div>
+                <table class='detail-grid'>
+                    <tr><th>Closing Date</th><td>—</td><th>Revolving Period End</th><td>—</td></tr><tr><th>Amortization Period End</th><td>—</td><th>Facility Maturity</th><td>—</td></tr><tr><th>Global Advances Outstanding</th><td>—</td><th>Global Commitment</th><td>Global Commitment</td></tr><tr><th>BMO Advances Outstanding</th><td>—</td><th>BMO Commitment</th><td>10000000</td></tr><tr><th>BMO Utilization</th><td>0.8</td><th>Collateral Par Balance</th><td>—</td></tr><tr><th>Effective Advance Rate</th><td>—</td><th>Max Facility Advance Rate</th><td>—</td></tr>
+                </table>
+            </div>
+            
+    </div>
+    

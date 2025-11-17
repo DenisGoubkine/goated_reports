@@ -1,0 +1,317 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Deal Config Studio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      font-family: "Inter", system-ui, sans-serif;
+      color: #0f1a33;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: radial-gradient(circle at top, #f9fbff, #eef2fb 65%);
+    }
+    header {
+      padding: 1.75rem 2rem 0.5rem;
+    }
+    .page-title {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 1.25rem 1.75rem;
+      border-radius: 18px;
+      background: #fff;
+      box-shadow: 0 18px 45px rgba(20,37,89,0.08);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: #0f1a33;
+    }
+    .page-title h1 {
+      margin: 0;
+      font-size: 2rem;
+      letter-spacing: -0.4px;
+    }
+    .page-title span {
+      font-size: 1rem;
+      color: #5d6d92;
+    }
+    main {
+      padding: 1rem 2rem 4rem;
+    }
+    .grid {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      gap: 2.4rem;
+      grid-template-columns: minmax(320px, 360px) minmax(520px, 1fr);
+      align-items: start;
+    }
+    .card {
+      background: #fff;
+      border-radius: 20px;
+      padding: 1.85rem 2rem 2.1rem;
+      box-shadow: 0 35px 80px rgba(12, 32, 85, 0.08);
+      border: 1px solid rgba(22, 44, 128, 0.05);
+    }
+    .card + .card {
+      margin-top: 0.5rem;
+    }
+    .card h2 {
+      margin: 0 0 0.5rem;
+      font-size: 1.1rem;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      color: #1e3d8f;
+    }
+    .card h3 {
+      margin: 1.2rem 0 0.3rem;
+      letter-spacing: 0.01em;
+    }
+    label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+    label span {
+      display: block;
+      font-weight: 400;
+      font-size: 0.85rem;
+      color: #5c6c8f;
+      margin-top: 0.15rem;
+    }
+    input, select {
+      width: 100%;
+      padding: 0.65rem 0.75rem;
+      border-radius: 12px;
+      border: 1px solid #d6e0f5;
+      font-size: 1rem;
+      background: #fbfcff;
+    }
+    .helper-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 0.5rem;
+      align-items: center;
+    }
+    textarea {
+      width: 100%;
+      min-height: 110px;
+      padding: 0.65rem 0.75rem;
+      border-radius: 12px;
+      border: 1px solid #d6e0f5;
+      font-size: 1rem;
+      background: #fbfcff;
+      resize: vertical;
+    }
+    .rows {
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+      margin: 0.6rem 0 0.8rem;
+      padding: 0.25rem 0.4rem 0.25rem 0;
+    }
+    .row {
+      display: grid;
+      gap: 0.55rem;
+    }
+    .row.kv { grid-template-columns: 1fr 1fr auto; }
+    .row.cell { grid-template-columns: 1fr 1fr 1fr auto; }
+    .row.calc { grid-template-columns: 1fr 1.2fr 1fr auto; }
+    button {
+      border: none;
+      border-radius: 999px;
+      padding: 0.6rem 1.1rem;
+      font-size: 0.95rem;
+      cursor: pointer;
+      letter-spacing: 0.01em;
+    }
+    button.primary { background: linear-gradient(120deg, #1a4fd9, #1dd3ff); color: #fff; }
+    button.secondary { background: linear-gradient(120deg, #101f67, #1a3bb5); color: #fff; }
+    button.light { background: #eaf0ff; color: #1d3ebd; border: 1px solid rgba(30,63,177,0.25); }
+    button.ghost { background: transparent; color: #113077; border: 1px dashed rgba(18,56,148,0.45); }
+    .toolbar {
+      display: flex;
+      gap: 0.7rem;
+      flex-wrap: wrap;
+      margin-top: 0.9rem;
+    }
+    .status {
+      margin-top: 0.75rem;
+      min-height: 1.2rem;
+      font-size: 0.9rem;
+      color: #1f4ed6;
+    }
+    .assistant {
+      font-size: 0.9rem;
+      color: #4b5d88;
+      line-height: 1.45;
+      margin: 0 0 0.8rem;
+    }
+    .step {
+      border: 1px solid rgba(27,73,191,0.12);
+      padding: 1rem 1.1rem 1.15rem;
+      border-radius: 14px;
+      background: #f5f7ff;
+      margin-top: 1rem;
+    }
+    .step-title {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #223c96;
+      margin-bottom: 0.25rem;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      background: #eef4ff;
+      color: #12318c;
+      font-weight: 600;
+      padding: 0.25rem 0.65rem;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      margin-bottom: 0.3rem;
+    }
+    .preview-card {
+      padding: 0;
+      overflow: hidden;
+      grid-column: 1 / -1;
+      margin-top: -0.5rem;
+    }
+    .preview-header {
+      padding: 1.1rem 1.4rem;
+      border-bottom: 1px solid #e0e7fb;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    pre {
+      margin: 0;
+      background: #040c1c;
+      color: #e3e9ff;
+      padding: 1.2rem 1.4rem;
+      max-height: 75vh;
+      overflow: auto;
+      font-size: 0.92rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="page-title">
+      <h1>Deal Config Studio</h1>
+      <span>Map Excel intelligence → JSON configs</span>
+      <a href="/report" style="color:#1a4fd9; text-decoration:none; font-size:0.95rem;">Open Report Builder →</a>
+    </div>
+  </header>
+
+  <main>
+    <div class="grid">
+      <section class="card" style="min-height: 100%;">
+        <h2>Step 1 · Start</h2>
+        <p class="assistant">Bring in a template you already have, or click “Start Blank” to build a new one deal-by-deal.</p>
+        <label for="config-select">Saved Configs</label>
+        <select id="config-select"></select>
+        <div class="toolbar">
+          <button id="load-config" class="secondary">Load Selected</button>
+          <button id="new-config" class="ghost">Start Blank</button>
+        </div>
+        <div class="toolbar">
+          <button id="upload-config" class="light">Upload JSON</button>
+          <input id="upload-input" type="file" accept="application/json" style="display:none" />
+        </div>
+        <div class="status" id="list-status"></div>
+        <div class="step">
+          <div class="step-title">Tip</div>
+          <p>Open the Excel pack in front of you. Every field you fill here mirrors something you already know in that workbook.</p>
+        </div>
+      </section>
+
+      <section class="card" style="min-height: 100%;">
+        <form id="config-form">
+          <h2>Step 2 · Deal Inputs</h2>
+          <label for="config-name">Config Name <span>Lowercase + hyphen (example: core-income-funding)</span></label>
+          <input id="config-name" placeholder="core-income-funding" autocomplete="off"/>
+
+          <label for="spv">SPV / Deal Name <span>Exactly as reported to investors</span></label>
+          <input id="spv" placeholder="Core Income Funding I LLC"/>
+
+          <label for="file-pattern">File Pattern <span>We’ll build the regex automatically</span></label>
+          <input id="file-pattern" placeholder="MidCap Borrowing Base \\d{4}-\\d{2}-\\d{2}\\.xlsx"/>
+          <div class="helper-row">
+            <input id="sample-file" placeholder="Paste a sample filename (e.g. MidCap Deal As of 2025-10-11.xlsx)">
+            <button type="button" id="build-regex" class="light">Use filename</button>
+          </div>
+
+          <label for="directory">Folder Path <span>Where these Excel files live</span></label>
+          <input id="directory" placeholder="\\\\networkshare\\deals\\midcap"/>
+
+          <div class="step">
+            <div class="step-title">Step 3 · Map the Numbers</div>
+            <p>Point us to the exact tabs + cells. If you can explain it over email, you can enter it here.</p>
+          </div>
+
+          <h3>Static Values</h3>
+          <p class="assistant">One-time data (manager, currency, custodian, etc.).</p>
+          <div id="static-rows" class="rows"></div>
+          <button type="button" id="add-static" class="light">+ Static Value</button>
+
+          <h3>Cell References</h3>
+          <p class="assistant">Numbers we must capture exactly as shown in Excel.</p>
+          <div id="cell-rows" class="rows"></div>
+          <button type="button" id="add-cell" class="light">+ Cell Reference</button>
+
+          <h3>Variables (for calculations only)</h3>
+          <p class="assistant">Temporary references used inside formulas; not stored in your loader DB.</p>
+          <div id="variable-rows" class="rows"></div>
+          <button type="button" id="add-variable" class="light">+ Variable</button>
+
+          <h3>Calculated Fields</h3>
+          <p class="assistant">Combine the variables above. Use the third box to tell us the data type (percentage, number, string, date).</p>
+          <div id="calc-rows" class="rows"></div>
+          <button type="button" id="add-calc" class="light">+ Calculation</button>
+
+          <div class="step">
+            <div class="step-title">Step 4 · Business Date Source</div>
+            <p>Tell us where the loader should read the business date: straight from the file name, or from a sheet/cell inside the workbook.</p>
+          </div>
+          <label for="data-source-type">Business Date Source <span>Pick “filename” to capture the date from the file name, or “cell reference” to read it from Excel.</span></label>
+          <select id="data-source-type">
+            <option value="filename">Filename (read date from file name)</option>
+            <option value="cell_reference">Cell reference (pull date from a sheet + cell)</option>
+          </select>
+          <label for="data-source-regex">Pattern or Sheet / Cell <span>If filename: enter the date regex. If cell reference: fill the Sheet & Cell inputs.</span></label>
+          <div class="helper-row" id="data-source-fields" style="grid-template-columns: repeat(3, 1fr); gap: 0.5rem;">
+            <input id="data-source-regex" placeholder="\\\\d{4}-\\\\d{2}-\\\\d{2}" />
+            <input id="data-source-sheet" placeholder="Sheet (e.g. Cover)" style="display:none;"/>
+            <input id="data-source-cell" placeholder="Cell (e.g. B2)" style="display:none;"/>
+          </div>
+
+          <div class="toolbar">
+            <button type="submit" class="primary">Save Deal Config</button>
+          </div>
+          <div class="status" id="form-status"></div>
+        </form>
+      </section>
+
+      <section class="card preview-card">
+        <div class="preview-header">
+          <div>
+            <h2 style="margin:0;">Step 5 · Review JSON</h2>
+            <small style="color:#556a98;">Live output updates as you type</small>
+          </div>
+          <button type="button" class="ghost" onclick="navigator.clipboard.writeText(document.getElementById('preview').textContent)">Copy JSON</button>
+        </div>
+        <pre id="preview">Loading…</pre>
+      </section>
+    </div>
+  </main>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
