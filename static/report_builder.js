@@ -218,9 +218,11 @@ function createSummaryRow(field = { label: "", source: "", format: "", aggregate
   removeBtn.className = "row-actions";
   removeBtn.textContent = "Remove";
   removeBtn.addEventListener("click", () => {
-    profile.summary_fields = profile.summary_fields.filter((item) => item !== field);
-    renderSummaryFields();
-    renderPreview();
+    if (window.confirm("Remove this shared summary field?")) {
+      profile.summary_fields = profile.summary_fields.filter((item) => item !== field);
+      renderSummaryFields();
+      renderPreview();
+    }
   });
 
   tr.appendChild(createCell(labelInput));

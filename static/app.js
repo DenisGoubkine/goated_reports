@@ -88,16 +88,21 @@ function addCalcRow(key = "", formula = "", dataType = "") {
   const formulaInput = createElement("input");
   formulaInput.placeholder = "Formula";
   formulaInput.value = formula;
-  const typeInput = createElement("input");
-  typeInput.placeholder = "Data type (percentage, number, string, date)";
-  typeInput.value = dataType || "";
+  const typeSelect = document.createElement("select");
+  ["", "percentage", "number", "string", "date"].forEach((opt) => {
+    const option = document.createElement("option");
+    option.value = opt;
+    option.textContent = opt || "Select type";
+    if (opt === (dataType || "")) option.selected = true;
+    typeSelect.appendChild(option);
+  });
   const removeBtn = createElement("button");
   removeBtn.type = "button";
   removeBtn.textContent = "✕";
   removeBtn.className = "light";
   removeBtn.addEventListener("click", () => { row.remove(); refreshPreview(); });
-  [keyInput, formulaInput, typeInput].forEach(input => input.addEventListener("input", refreshPreview));
-  row.append(keyInput, formulaInput, typeInput, removeBtn);
+  [keyInput, formulaInput, typeSelect].forEach((input) => input.addEventListener("input", refreshPreview));
+  row.append(keyInput, formulaInput, typeSelect, removeBtn);
   sections.calc.appendChild(row);
 }
 
